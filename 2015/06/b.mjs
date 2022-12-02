@@ -10,8 +10,8 @@ const parseInstruction = instruction => {
 };
 
 const grid = Array(1000)
-  .fill()
-  .map(() => Array(1000).fill(false));
+  .fill(0)
+  .map(() => Array(1000).fill(0));
 
 input.forEach(instruction => {
   const { action, x1, y1, x2, y2 } = parseInstruction(instruction);
@@ -19,19 +19,19 @@ input.forEach(instruction => {
     for (let y = y1; y <= y2; y++) {
       switch (action) {
         case "on":
-          grid[x][y] = true;
+          grid[x][y]++;
           break;
         case "off":
-          grid[x][y] = false;
+          grid[x][y] = Math.max(0, grid[x][y] - 1);
           break;
         case "toggle":
-          grid[x][y] = !grid[x][y];
+          grid[x][y] += 2;
           break;
       }
     }
   }
 });
 
-const total = grid.reduce((acc, row) => acc + row.reduce((acc, cell) => acc + (cell ? 1 : 0), 0), 0);
+const total = grid.reduce((acc, row) => acc + row.reduce((acc, cell) => acc + cell, 0), 0);
 
 console.log(total);
