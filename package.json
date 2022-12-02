@@ -9,6 +9,7 @@
   "author": "Aivars Liepa",
   "license": "MIT",
   "dependencies": {
-    "md5": "^2.3.0"
+    "md5": "^2.3.0",
+    "rxjs": "^7.5.7"
   }
 }
