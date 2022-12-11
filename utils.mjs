@@ -8,17 +8,29 @@ export const readInput = async path => {
   return file;
 };
 
-export const readLines = async filePath => {
+export const readLines = async (filePath, chunkSize = 1, skipAfterChunk = false) => {
   const fileStream = fs.createReadStream(path.resolve(cwd(), filePath));
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity,
   });
-  const lines = [];
+  const chunks = [];
+  let currChunk = [];
+  let skipping = false;
   for await (const line of rl) {
-    lines.push(line);
+    if (skipAfterChunk && skipping) {
+      skipping = false;
+      continue;
+    }
+
+    currChunk.push(line);
+    if (currChunk.length === chunkSize) {
+      chunks.push(currChunk);
+      currChunk = [];
+      skipping = true;
+    }
   }
-  return lines;
+  return chunks;
 };
 
 export const permutate = arr => {
