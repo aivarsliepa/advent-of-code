@@ -30,6 +30,11 @@ export const readLines = async (filePath, chunkSize = 1, skipAfterChunk = false)
       skipping = true;
     }
   }
+
+  if (chunkSize === 1) {
+    return chunks.flat();
+  }
+
   return chunks;
 };
 
@@ -62,4 +67,52 @@ export const range = (start, end) => {
     arr.push(i);
   }
   return arr;
+};
+
+const getStringArrKey = arr => {
+  return arr.slice().sort().join("");
+};
+
+/**
+ * This will return [a, b] and [b, a] as seperate combination.
+ * If placement is not important, then need to improve this function.
+ */
+// export const combinations = (arr, length) => {
+//   if (length === 1) {
+//     return arr;
+//   }
+
+//   const combos = [];
+//   for (let i = 0; i < arr.length; i++) {
+//     const subCombos = combinations(arr, length - 1);
+
+//     subCombos.forEach(subCombo => {
+//       combos.push([arr[i]].concat(subCombo));
+//     });
+//   }
+
+//   return combos;
+// };
+
+export const combinations = (arr, length) => {
+  const results = [];
+  combinationRoutine(results, [], arr, length, {});
+  return results;
+};
+
+export const combinationRoutine = (results, combination, sourceArr, length, memo) => {
+  if (combination.length === length) {
+    results.push(combination);
+    return;
+  }
+
+  sourceArr.forEach(elem => {
+    const subCombination = combination.concat([elem]);
+
+    const key = getStringArrKey(subCombination);
+    if (key in memo) return;
+    memo[key] = true;
+
+    combinationRoutine(results, subCombination, sourceArr, length, memo);
+  });
 };
