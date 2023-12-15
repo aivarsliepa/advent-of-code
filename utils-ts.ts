@@ -72,6 +72,10 @@ export const range = (start: number, end: number) => {
   return arr;
 };
 
+export const writeFile = (filePath: string, data: string) => {
+  fs.writeFileSync(path.resolve(cwd(), filePath), data);
+};
+
 // const getStringArrKey = arr => {
 //   return arr.slice().sort().join("");
 // };

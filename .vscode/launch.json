@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch via ts-node",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "program": "${workspaceFolder}/2023/03/a.ts",
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "cwd": "${workspaceFolder}/2023/03"
+      // "sourceMaps": true
+    }
+  ]
+}

@@ -4,10 +4,11 @@ type NumberData = {
   line: number;
   start: number;
   end: number;
-  hasNearSymbol: boolean;
+  gears: [number, number][]; // [line, index]
   number: number;
 };
 
+const GEAR = "*";
 const numbers: NumberData[] = [];
 
 readLines("./input.txt").then(input => {
@@ -22,7 +23,7 @@ readLines("./input.txt").then(input => {
           line: lineI,
           start: currentStart,
           end: i - 1,
-          hasNearSymbol: false,
+          gears: [],
           number: parseInt(line.slice(currentStart, i)),
         });
         currentStart = -1;
@@ -34,7 +35,7 @@ readLines("./input.txt").then(input => {
         line: lineI,
         start: currentStart,
         end: line.length - 1,
-        hasNearSymbol: false,
+        gears: [],
         number: parseInt(line.slice(currentStart, line.length)),
       });
     }
@@ -52,8 +53,8 @@ readLines("./input.txt").then(input => {
       for (let i = startIndex; i <= endIndex; i++) {
         const ch = prevLine[i];
 
-        if (!isCharDigit(ch) && ch !== ".") {
-          return setHasSymbol(number);
+        if (ch === GEAR) {
+          number.gears.push([line - 1, i]);
         }
       }
     }
@@ -64,8 +65,8 @@ readLines("./input.txt").then(input => {
       for (let i = startIndex; i <= endIndex; i++) {
         const ch = nextLine[i];
 
-        if (!isCharDigit(ch) && ch !== ".") {
-          return setHasSymbol(number);
+        if (ch === GEAR) {
+          number.gears.push([line + 1, i]);
         }
       }
     }
@@ -73,24 +74,48 @@ readLines("./input.txt").then(input => {
     if (start > 0) {
       const prevChar = input[line][start - 1];
 
-      if (prevChar !== ".") {
-        return setHasSymbol(number);
+      if (prevChar === GEAR) {
+        number.gears.push([line, start - 1]);
       }
     }
 
     if (end < input[0].length - 1) {
       const nextChar = input[line][end + 1];
 
-      if (nextChar !== ".") {
-        return setHasSymbol(number);
+      if (nextChar === GEAR) {
+        number.gears.push([line, end + 1]);
       }
     }
   });
 
-  const sum = numbers
-    .filter(number => number.hasNearSymbol)
-    .reduce((acc, number) => {
-      return acc + number.number;
+  type Gear = {
+    line: number;
+    index: number;
+    numbers: number[];
+  };
+
+  const gears: Gear[] = [];
+
+  numbers.forEach(number => {
+    number.gears.forEach(([line, index]) => {
+      let gearData = gears.find(g => g.line === line && g.index === index);
+      if (!gearData) {
+        gearData = {
+          line,
+          index,
+          numbers: [],
+        };
+        gears.push(gearData);
+      }
+
+      gearData.numbers.push(number.number);
+    });
+  });
+
+  const sum = gears
+    .filter(g => g.numbers.length === 2)
+    .reduce((acc, gear) => {
+      return acc + gear.numbers[0] * gear.numbers[1];
     }, 0);
 
   console.log(sum);
@@ -98,8 +123,4 @@ readLines("./input.txt").then(input => {
 
 function isCharDigit(char: string) {
   return !isNaN(parseInt(char));
-}
-
-function setHasSymbol(numberData: NumberData) {
-  numberData.hasNearSymbol = true;
 }
