@@ -3,7 +3,7 @@ import readline from "readline";
 import path from "path";
 import { cwd } from "process";
 
-export const readInput = async path => {
+export const readInput = async (path: string) => {
   const file = await fs.readFileSync(path, "utf8");
   return file;
 };
@@ -56,7 +56,7 @@ export const permutate = <T>(arr: T[]) => {
   return permutations;
 };
 
-export const chunkArray = <T>(arr: T[], chunkSize) => {
+export const chunkArray = <T>(arr: T[], chunkSize: number) => {
   const chunks: T[][] = [];
   for (let i = 0; i < arr.length; i += chunkSize) {
     chunks.push(arr.slice(i, i + chunkSize));
@@ -72,9 +72,9 @@ export const range = (start: number, end: number) => {
   return arr;
 };
 
-const getStringArrKey = arr => {
-  return arr.slice().sort().join("");
-};
+// const getStringArrKey = arr => {
+//   return arr.slice().sort().join("");
+// };
 
 /**
  * This will return [a, b] and [b, a] as seperate combination.
@@ -97,25 +97,25 @@ const getStringArrKey = arr => {
 //   return combos;
 // };
 
-export const combinations = (arr, length) => {
-  const results = [];
-  combinationRoutine(results, [], arr, length, {});
-  return results;
-};
+// export const combinations = <T>(arr: T[], length: number) => {
+//   const results = [];
+//   combinationRoutine(results, [], arr, length, {});
+//   return results;
+// };
 
-export const combinationRoutine = (results, combination, sourceArr, length, memo) => {
-  if (combination.length === length) {
-    results.push(combination);
-    return;
-  }
+// export const combinationRoutine = (results, combination, sourceArr, length, memo) => {
+//   if (combination.length === length) {
+//     results.push(combination);
+//     return;
+//   }
 
-  sourceArr.forEach(elem => {
-    const subCombination = combination.concat([elem]);
+//   sourceArr.forEach(elem => {
+//     const subCombination = combination.concat([elem]);
 
-    const key = getStringArrKey(subCombination);
-    if (key in memo) return;
-    memo[key] = true;
+//     const key = getStringArrKey(subCombination);
+//     if (key in memo) return;
+//     memo[key] = true;
 
-    combinationRoutine(results, subCombination, sourceArr, length, memo);
-  });
-};
+//     combinationRoutine(results, subCombination, sourceArr, length, memo);
+//   });
+// };
