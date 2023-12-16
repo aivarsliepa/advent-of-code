@@ -9,10 +9,9 @@ const nodes: Record<string, Node> = {};
 const regex = /\(([0-9A-Z]+),\s([0-9A-Z]+)\)/;
 
 const currentNodes: string[] = [];
+const iterations: number[] = [];
 
-let iterations = 0;
-let nodesTillEnd = 0;
-readLines("./test3-input.txt")
+readLines("./input.txt")
   .then(input => {
     const instructions = input[0];
 
@@ -24,31 +23,38 @@ readLines("./test3-input.txt")
 
       if (node[2] === "A") {
         currentNodes.push(node);
-        nodesTillEnd++;
       }
     }
 
-    while (true) {
-      for (let i = 0; i < instructions.length; i++) {
-        iterations++;
-        const instruction = instructions[i] === "L" ? "left" : "right";
-
-        for (let j = 0; j < currentNodes.length; j++) {
-          const node = currentNodes[j];
-          const nextNode = nodes[node][instruction];
-          currentNodes[j] = nextNode;
-
-          if (node[2] === "Z" && nextNode[2] !== "Z") {
-            nodesTillEnd++;
-          } else if (node[2] !== "Z" && nextNode[2] === "Z") {
-            nodesTillEnd--;
-          }
+    for (let j = 0; j < currentNodes.length; j++) {
+      iterations[j] = 0;
+      let currentNode = currentNodes[j];
+      while (currentNode[2] !== "Z") {
+        for (let i = 0; i < instructions.length; i++) {
+          iterations[j]++;
+          const instruction = instructions[i] === "L" ? "left" : "right";
+          currentNode = nodes[currentNode][instruction];
         }
-
-        if (nodesTillEnd === 0) return;
       }
     }
   })
   .then(() => {
     console.log(iterations);
+    console.log(lcmArray(iterations));
   });
+
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
+function lcm(a: number, b: number): number {
+  return Math.abs(a * b) / gcd(a, b);
+}
+
+function lcmArray(numbers: number[]): number {
+  let multiple = 1;
+  numbers.forEach(n => {
+    multiple = lcm(multiple, n);
+  });
+  return multiple;
+}
