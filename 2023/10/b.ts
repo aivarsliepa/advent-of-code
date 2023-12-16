@@ -111,8 +111,7 @@ function countInsideLoop() {
   for (let y = 0; y < grid.length; y++) {
     const row = grid[y];
     for (let x = 0; x < row.length; x++) {
-      const cell = row[x];
-      if (cell === "." || !isLoopPipe[y][x]) {
+      if (!isLoopPipe[y][x]) {
         if (isInsideFromNorth({ x, y }) && isInsideFromSouth({ x, y }) && isInsideFromWest({ x, y }) && isInsideFromEast({ x, y })) {
           total++;
         }
