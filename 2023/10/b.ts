@@ -61,8 +61,6 @@ readLines("./input.txt")
       currentCoords = nextCoords;
     } while (currentCoords.x !== startPoint.x || currentCoords.y !== startPoint.y);
 
-    // return scanlineFill(loopPipes);
-    // return scanlineFill(vertices);
     return countInsideLoop();
   })
   .then(output => {
@@ -114,7 +112,7 @@ function countInsideLoop() {
     const row = grid[y];
     for (let x = 0; x < row.length; x++) {
       const cell = row[x];
-      if (cell === ".") {
+      if (cell === "." || !isLoopPipe[y][x]) {
         if (isInsideFromNorth({ x, y }) && isInsideFromSouth({ x, y }) && isInsideFromWest({ x, y }) && isInsideFromEast({ x, y })) {
           total++;
         }
@@ -222,84 +220,3 @@ function isInsideFromEast(coords: Coords) {
   }
   return inside;
 }
-
-// function scanlineFill(vertices: Coords[]) {
-//   let total = 0;
-
-//   // Sort vertices by y-coordinate
-//   vertices.sort((a, b) => a.y - b.y);
-
-//   // Initialize scanline intersections array
-//   let intersections = [];
-
-//   // For each y-coordinate from min to max
-//   for (let y = vertices[0].y; y <= vertices[vertices.length - 1].y; y++) {
-//     // Find intersections of y-coordinate with edges
-//     for (let i = 0; i < vertices.length; i++) {
-//       let v1 = vertices[i];
-//       let v2 = vertices[(i + 1) % vertices.length]; // Wrap around to start for last vertex
-
-//       if ((v1.y <= y && v2.y > y) || (v2.y <= y && v1.y > y)) {
-//         // If edge crosses scanline
-//         // Compute intersection x-coordinate
-//         let x = v1.x + ((y - v1.y) * (v2.x - v1.x)) / (v2.y - v1.y);
-//         intersections.push(x);
-//       }
-//     }
-
-//     // Sort intersections by x-coordinate
-//     intersections.sort((a, b) => a - b);
-
-//     // Pairs of intersections form segments inside the loop
-//     for (let i = 0; i < intersections.length; i += 2) {
-//       // All cells with x-coordinates between the x-coordinates of each pair are inside the loop
-//       for (let x = Math.ceil(intersections[i]); x < intersections[i + 1]; x++) {
-//         if (!loopPipes.some(p => p.x === x && p.y === y)) {
-//           total++;
-//           console.log(y, x);
-//         }
-//       }
-//     }
-
-//     // Clear intersections for next scanline
-//     intersections = [];
-//   }
-
-//   return total;
-// }
-
-// function scanlineFill2(vertices: Coords[]) {
-//   let total = 0;
-
-//   vertices.sort((a, b) => a.y - b.y);
-
-//   let intersections: number[] = [];
-
-//   for (let y = vertices[0].y; y <= vertices[vertices.length - 1].y; y++) {
-//     for (let i = 0; i < vertices.length; i++) {
-//       let v1 = vertices[i];
-//       let v2 = vertices[(i + 1) % vertices.length];
-
-//       if ((v1.y <= y && v2.y > y) || (v2.y <= y && v1.y > y)) {
-//         let x = v1.x + ((y - v1.y) * (v2.x - v1.x)) / (v2.y - v1.y);
-//         intersections.push(x);
-//       }
-//     }
-
-//     intersections.sort((a, b) => a - b);
-
-//     let inside = false;
-//     for (let i = 0; i < intersections.length; i++) {
-//       if (inside) {
-//         for (let x = Math.ceil(intersections[i]); x < intersections[i + 1]; x++) {
-//           total++;
-//         }
-//       }
-//       inside = !inside;
-//     }
-
-//     intersections = [];
-//   }
-
-//   return total;
-// }
