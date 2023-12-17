@@ -1,24 +1,14 @@
 import { readLines } from "../../utils-ts";
 
-let memoHits = 0;
-let wrongCombinations = 0;
-
-readLines("./test-input.txt")
+readLines("./input.txt")
   .then(input => {
     return input
-      .map((line, i) => {
-        const start = performance.now();
+      .map(line => {
         const [str, groupsStr] = line.split(" ");
         const newGroupsStr = new Array(5).fill(groupsStr).join(",");
         const newString = new Array(5).fill(str).join("?");
         const groups = newGroupsStr.split(",").map(Number);
-        console.log(newString, newGroupsStr);
-        wrongCombinations = 0;
-        const result = countCombinations(newString, groups);
-        const diff = performance.now() - start;
-        console.log(result, performance.now() - start, i, memoHits, wrongCombinations);
-
-        return result;
+        return countCombinations(newString, groups);
       })
       .reduce((acc, curr) => acc + curr, 0);
   })
@@ -27,8 +17,12 @@ readLines("./test-input.txt")
   });
 
 function countCombinations(str: string, groups: number[], strIndex = 0, groupIndex = 0, count = 0, memo: Record<string, number> = {}): number {
+  const key = `${strIndex}-${groupIndex}-${count}`;
+  if (key in memo) {
+    return memo[key];
+  }
+
   if (groupIndex === groups.length && count > 0) {
-    wrongCombinations++;
     return 0;
   }
 
@@ -44,14 +38,7 @@ function countCombinations(str: string, groups: number[], strIndex = 0, groupInd
       return 1;
     }
 
-    wrongCombinations++;
     return 0;
-  }
-
-  const key = `${strIndex}-${groupIndex}-${count}`;
-  if (key in memo) {
-    memoHits++;
-    return memo[key];
   }
 
   const currentGroupLength = groups[groupIndex];
@@ -59,11 +46,9 @@ function countCombinations(str: string, groups: number[], strIndex = 0, groupInd
   const shouldBePound = count > 0 && count < currentGroupLength;
   const shouldBeDot = didFinishGroup;
   if (shouldBeDot && char === "#") {
-    wrongCombinations++;
     return 0;
   }
   if (shouldBePound && char === ".") {
-    wrongCombinations++;
     return 0;
   }
 
