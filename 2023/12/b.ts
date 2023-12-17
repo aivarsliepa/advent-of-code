@@ -1,6 +1,8 @@
 import { readLines } from "../../utils-ts";
 
-readLines("./test-input.txt")
+let memoHits = 0;
+
+readLines("./input.txt")
   .then(input => {
     return input
       .map((line, i) => {
@@ -10,12 +12,11 @@ readLines("./test-input.txt")
         const newString = new Array(5).fill(str).join("?");
         const groups = newGroupsStr.split(",").map(Number);
         console.log(newString, newGroupsStr);
-        const result = getCombinations(newString, groups, new Set());
+        const result = countCombinations(newString, groups);
         const diff = performance.now() - start;
-        if (diff > 1000) {
-          console.log(str, groups, result.size, performance.now() - start, i);
-        }
-        return result.size;
+        console.log(result, performance.now() - start, i, memoHits);
+
+        return result;
       })
       .reduce((acc, curr) => acc + curr, 0);
   })
@@ -23,54 +24,56 @@ readLines("./test-input.txt")
     console.log(output);
   });
 
-function getCombinations(line: string, groups: number[], result: Set<string>) {
-  let queue: string[] = [line];
-  const poundsNeeded = groups.reduce((acc, curr) => acc + curr, 0);
-  const dotsNeeded = line.length - poundsNeeded;
-
-  while (queue.length > 0) {
-    let currentLine = queue.shift() as string;
-
-    if (currentLine.includes("?")) {
-      const questionMarks = currentLine.match(/\?/g)?.length || 0;
-      const pounds = currentLine.match(/\#/g)?.length || 0;
-      const dots = currentLine.match(/\./g)?.length || 0;
-
-      if (dots < dotsNeeded && dotsNeeded - dots <= questionMarks) {
-        queue.push(currentLine.replace("?", "."));
-      }
-      if (pounds < poundsNeeded && poundsNeeded - pounds <= questionMarks) {
-        queue.push(currentLine.replace("?", "#"));
-      }
-    } else {
-      let groupI = 0;
-      let hasToBeSpace = false;
-      for (let i = 0; i < currentLine.length; i++) {
-        if (hasToBeSpace) {
-          if (currentLine[i] !== ".") {
-            break;
-          } else {
-            hasToBeSpace = false;
-          }
-        }
-
-        const groupLength = groups[groupI];
-
-        if (currentLine[i] === "#") {
-          if (groupI >= groups.length || currentLine.substring(i, i + groupLength) !== "#".repeat(groupLength)) {
-            break;
-          }
-          groupI++;
-          hasToBeSpace = true;
-          i += groupLength - 1;
-        }
-
-        if (i === currentLine.length - 1 && groupI === groups.length) {
-          result.add(currentLine);
-        }
-      }
-    }
+function countCombinations(str: string, groups: number[], strIndex = 0, groupIndex = 0, count = 0, memo: Record<string, number> = {}): number {
+  if (groupIndex === groups.length && count > 0) {
+    return 0;
   }
 
-  return result;
+  let didFinishGroup = false;
+  if (count === groups[groupIndex]) {
+    didFinishGroup = true;
+    groupIndex++;
+    count = 0;
+  }
+
+  if (strIndex === str.length) {
+    if (groupIndex === groups.length) {
+      return 1;
+    }
+
+    return 0;
+  }
+
+  const key = `${strIndex}-${groupIndex}-${count}`;
+  if (memo[key]) {
+    memoHits++;
+    return memo[key];
+  }
+
+  const currentGroupLength = groups[groupIndex];
+  const char = str[strIndex];
+  const shouldBePound = count > 0 && count < currentGroupLength;
+  const shouldBeDot = didFinishGroup;
+  if (shouldBeDot && char === "#") return 0;
+  if (shouldBePound && char === ".") return 0;
+
+  let total = 0;
+  const nextStrIndex = strIndex + 1;
+  if (char === "?") {
+    if (!shouldBeDot) {
+      // pound
+      total += countCombinations(str, groups, nextStrIndex, groupIndex, count + 1);
+    }
+    if (!shouldBePound) {
+      // dot
+      total += countCombinations(str, groups, nextStrIndex, groupIndex, 0);
+    }
+  } else if (char === ".") {
+    total += countCombinations(str, groups, nextStrIndex, groupIndex, 0);
+  } else if (char === "#") {
+    total += countCombinations(str, groups, nextStrIndex, groupIndex, count + 1);
+  }
+
+  memo[key] = total;
+  return total;
 }
