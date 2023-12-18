@@ -3,9 +3,9 @@ import readline from "readline";
 import path from "path";
 import { cwd } from "process";
 
-export const readInput = async (path: string) => {
-  const file = await fs.readFileSync(path, "utf8");
-  return file;
+export const readLinesSync = (path: string) => {
+  const file = fs.readFileSync(path, "utf8");
+  return file.split("\n");
 };
 
 export async function readLines(filePath: string, chunkSize?: undefined, skipAfterChunk?: boolean): Promise<string[]>;
