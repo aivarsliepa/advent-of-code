@@ -15,8 +15,27 @@ class PriorityQueue {
     if (lowestScores.has(key) && lowestScores.get(key)! <= priority) return;
     lowestScores.set(key, priority);
 
-    this.queue.push({ value, priority });
-    this.queue.sort((a, b) => a.priority - b.priority);
+    const newItem = { value, priority };
+    if (this.queue.length === 0) {
+      this.queue.push(newItem);
+    } else {
+      let start = 0;
+      let end = this.queue.length - 1;
+
+      while (start <= end) {
+        const mid = Math.floor((start + end) / 2);
+        if (this.queue[mid].priority === priority) {
+          this.queue.splice(mid, 0, newItem);
+          return;
+        } else if (this.queue[mid].priority < priority) {
+          start = mid + 1;
+        } else {
+          end = mid - 1;
+        }
+      }
+
+      this.queue.splice(start, 0, newItem);
+    }
   }
 
   public dequeue() {
@@ -45,7 +64,8 @@ function getKey(coords: Coords) {
   return `${coords.x},${coords.y}`;
 }
 
-const MAX_STRAIGHT_MOVES = 3;
+const MAX_STRAIGHT_MOVES = 10;
+const MIN_STRAIGHT_MOVES = 4;
 const grid: number[][] = [];
 
 const input = readLinesSync("./input.txt");
@@ -67,12 +87,16 @@ function getPriority(coords: Coords) {
   return grid[coords.y][coords.x];
 }
 
+const start = performance.now();
+
+let iterations = 0;
 function findShortestPath() {
   while (queue.length > 0) {
+    iterations++;
     const move = queue.dequeue()!;
     const { priority, value: data } = move;
 
-    if (data.coords.x === TARGET.x && data.coords.y === TARGET.y) {
+    if (data.coords.x === TARGET.x && data.coords.y === TARGET.y && data.straightMoves >= MIN_STRAIGHT_MOVES) {
       return priority;
     }
 
@@ -82,6 +106,7 @@ function findShortestPath() {
       queue.enqueue(nextMove, priority + getPriority(nextMove.coords));
     }
 
+    if (data.straightMoves < MIN_STRAIGHT_MOVES) continue;
     const deg90Direction = deg90(data.direction);
     const deg90Move = { coords: plusDirection(data.coords, deg90Direction), straightMoves: 1, direction: deg90Direction };
 
@@ -152,3 +177,4 @@ function deg270(direction: Coords) {
 }
 
 console.log(findShortestPath());
+console.log(performance.now() - start);
