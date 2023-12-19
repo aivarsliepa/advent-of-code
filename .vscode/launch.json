@@ -6,9 +6,9 @@
       "request": "launch",
       "name": "Launch via ts-node",
       "runtimeArgs": ["-r", "ts-node/register"],
-      "program": "${workspaceFolder}/2023/18/a.ts",
+      "program": "${workspaceFolder}/2023/19/b.ts",
       "outFiles": ["${workspaceFolder}/**/*.js"],
-      "cwd": "${workspaceFolder}/2023/18"
+      "cwd": "${workspaceFolder}/2023/19"
       // "sourceMaps": true
     }
   ]
