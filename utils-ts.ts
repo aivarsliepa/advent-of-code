@@ -133,3 +133,19 @@ export function deferred<T>() {
   });
   return { promise, resolve: resolve!, reject: reject! };
 }
+
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
+export function lcm(a: number, b: number): number {
+  return Math.abs(a * b) / gcd(a, b);
+}
+
+export function lcmArray(numbers: number[]): number {
+  let multiple = 1;
+  numbers.forEach(n => {
+    multiple = lcm(multiple, n);
+  });
+  return multiple;
+}
